@@ -21,7 +21,7 @@ public class OrderServiceRecource {
 	@PostMapping(value = "/check-order", consumes = "application/json", produces = "application/json")
 	public String checkOrder(@RequestBody Customer customer) {
 		
-		RestTemplate restTemplate =  new RestTemplate();;
+		RestTemplate restTemplate =  new RestTemplate();
 
 		String msg = "ORDER SUCCESSFULL";
 
