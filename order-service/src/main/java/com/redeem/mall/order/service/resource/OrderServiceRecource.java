@@ -18,13 +18,6 @@ import com.redeem.mall.order.service.model.InventoryDetails;
 @RequestMapping("/order")
 public class OrderServiceRecource {
 
-
-	@RequestMapping("/place-order/{item}")
-	public String placeOrder(@PathVariable("item") String item) {
-		return "Order Placed";
-
-	}
-
 	@PostMapping(value = "/check-order", consumes = "application/json", produces = "application/json")
 	public String checkOrder(@RequestBody Customer customer) {
 		
