@@ -1,10 +1,10 @@
-package com.redeem.mall.order;
+package com.server.redeemEcom;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OrderServiceApplicationTests {
+class RedeemEcomServerApplicationTests {
 
 	@Test
 	void contextLoads() {

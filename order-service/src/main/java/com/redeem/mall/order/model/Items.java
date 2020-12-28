@@ -1,4 +1,4 @@
-package com.redeem.mall.order.service.model;
+package com.redeem.mall.order.model;
 
 public class Items {
 	
