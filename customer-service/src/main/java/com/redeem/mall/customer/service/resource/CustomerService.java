@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.redeem.mall.customer.service.entity.CustomerDetails;
+import com.redeem.mall.customer.service.exception.CustomerServiceException;
 import com.redeem.mall.customer.service.repository.CustomerDetaisRepository;
 
 @Service
@@ -24,16 +25,31 @@ public class CustomerService {
 	}
 
 	public int getLoyaltyPoints(String userName) {
+		/*
+		 *loyaltyMap contains user name as KEY and the total loyalty points of the user as VALUE.
+		 */
 		Map<String, Integer> loyaltyMap = new HashMap<String, Integer>();
-		customerEntityRepository.findAll()
-				.forEach(customer -> loyaltyMap.put(customer.getUserName(), customer.getLoyaltyPoints()));
-		int loyalty;
-		try {
+		boolean userExists = checkIfUserExists(userName);
+		if (userExists) {
+			customerEntityRepository.findAll()
+					.forEach(customer -> loyaltyMap.put(customer.getUserName(), customer.getLoyaltyPoints()));
+			int loyalty;
+
 			loyalty = loyaltyMap.get(userName);
-		} catch (NullPointerException e) {
-			return 99999;
+			return loyalty;
+		}else {
+			throw new CustomerServiceException("User is Not available");
 		}
-		return loyalty;
+
+	}
+
+	private boolean checkIfUserExists(String userName) {
+		try {
+			customerEntityRepository.findById(userName).get();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

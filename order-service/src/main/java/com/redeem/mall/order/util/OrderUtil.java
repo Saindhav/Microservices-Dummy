@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import com.redeem.mall.order.exception.OrderServiceException;
 import com.redeem.mall.order.model.InventoryDetails;
 import com.redeem.mall.order.model.Response;
 import com.redeem.mall.order.service.CustomerService;
@@ -44,23 +45,32 @@ public class OrderUtil {
 		}
 	}
 
-	public Response checkLoyaltyPointsAvailbility(String userName, List<InventoryDetails> itemLists) {
+	public Response checkLoyaltyPointsAvailbility(String userName, List<InventoryDetails> itemLists) throws OrderServiceException {
 
-		int loyaltyPointsAvailable = customerService.getAvailableLoyaltyPoints(userName);
-		if(-1 == loyaltyPointsAvailable)
-			return new Response(HttpStatus.GATEWAY_TIMEOUT, "We're cheking your order. Please Wait!!");
+			int loyaltyPointsAvailable;
+			try {
+				/*
+				 * loyaltyPointsAvailable contains the value of total loyalty point a user has.
+				 */
+				loyaltyPointsAvailable = customerService.getAvailableLoyaltyPoints(userName);
+			} catch (Exception e) {
+				return new Response(HttpStatus.NOT_FOUND, "USER NOT FOUND");
+			}
+				
+			/*
+			 * loyaltyPointsOrdered contains the value of total loyalty point required for the order.
+			 */
+			int loyaltyPointsOrdered = inventoryService.getTotalLoyaltyCost(itemLists);
+			if(-1 == loyaltyPointsOrdered)
+				return new Response(HttpStatus.GATEWAY_TIMEOUT, "We're cheking your order. Please Wait!!");
 
-		int loyaltyPointsOrdered = inventoryService.getTotalLoyaltyCost(itemLists);
-		if(-1 == loyaltyPointsOrdered)
-			return new Response(HttpStatus.GATEWAY_TIMEOUT, "We're cheking your order. Please Wait!!");
-
-		if (loyaltyPointsOrdered > loyaltyPointsAvailable) {
-			return new Response(HttpStatus.OK,
-					"YOUR ORDER PRICE IS " + loyaltyPointsOrdered + " AND YOUR AVAILABLE LOYALTY POINT IS "
-							+ loyaltyPointsAvailable + " KINDLY REDUCE YOUR QUANTITY");
-		} else {
-			return null;
-		}
+			if (loyaltyPointsOrdered > loyaltyPointsAvailable) {
+				return new Response(HttpStatus.OK,
+						"YOUR ORDER PRICE IS " + loyaltyPointsOrdered + " AND YOUR AVAILABLE LOYALTY POINT IS "
+								+ loyaltyPointsAvailable + " KINDLY REDUCE YOUR QUANTITY");
+			} else {
+				return null;
+			}
 	}
 	
 	public Response checkInventoryAvailability(List<InventoryDetails> itemLists) {

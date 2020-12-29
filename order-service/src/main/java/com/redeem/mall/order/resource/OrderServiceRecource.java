@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.redeem.mall.order.exception.OrderServiceException;
 import com.redeem.mall.order.model.Customer;
 import com.redeem.mall.order.model.InventoryDetails;
 import com.redeem.mall.order.model.Response;
@@ -22,24 +23,29 @@ public class OrderServiceRecource {
 	private OrderUtil orderUtil;
 
 	@PostMapping(value = "/check-order", consumes = "application/json", produces = "application/json")
-	public Response checkOrder(@RequestBody Customer customer) {
+	public Response checkOrder(@RequestBody Customer customer) throws OrderServiceException {
+		Response response = null;
+		try {
+			List<InventoryDetails> itemLists = customer.getItemsList();
+			
+			response = orderUtil.validateQuantities(itemLists);
 
-		List<InventoryDetails> itemLists = customer.getItemsList();
+			if (null != response)
+				return response;
+
+			response = orderUtil.checkLoyaltyPointsAvailbility(customer.getUserName(), itemLists);
+
+			if (null != response)
+				return response;
+			
+			response = orderUtil.checkInventoryAvailability(itemLists);
+
+			if (null != response)
+				return response;
 		
-		Response response = orderUtil.validateQuantities(itemLists);
-
-		if (null != response)
-			return response;
-
-		response = orderUtil.checkLoyaltyPointsAvailbility(customer.getUserName(), itemLists);
-
-		if (null != response)
-			return response;
-		
-		response = orderUtil.checkInventoryAvailability(itemLists);
-
-		if (null != response)
-			return response;
+		} catch (RuntimeException e) {
+			throw new OrderServiceException(response.getStatusMsg());
+		}
 
 		return new Response(HttpStatus.OK, "ORDER SUCCESSFULL");
 	}
