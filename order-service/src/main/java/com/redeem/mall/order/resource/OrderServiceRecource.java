@@ -22,7 +22,7 @@ public class OrderServiceRecource {
 	@Autowired
 	private OrderUtil orderUtil;
 
-	@PostMapping(value = "/check-order", consumes = "application/json", produces = "application/json")
+	@PostMapping(value = "/order-details", consumes = "application/json", produces = "application/json")
 	public Response checkOrder(@RequestBody Customer customer) throws OrderServiceException {
 		Response response = null;
 		try {
