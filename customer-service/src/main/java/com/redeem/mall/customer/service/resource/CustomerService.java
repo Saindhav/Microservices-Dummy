@@ -38,7 +38,7 @@ public class CustomerService {
 			loyalty = loyaltyMap.get(userName);
 			return loyalty;
 		}else {
-			throw new CustomerServiceException("User is Not available");
+			throw new CustomerServiceException("User is Not available Currently");
 		}
 
 	}
